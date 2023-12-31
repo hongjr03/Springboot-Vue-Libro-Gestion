@@ -42,11 +42,26 @@
               </el-col>
             </el-row>
           </el-col>
+          <el-col :span="4" class="search-page-pane">
+            <el-button
+              type="primary"
+              class="return-button"
+              @click="returnSelectedBook"
+            >
+              归还选中图书
+            </el-button>
+          </el-col>
         </el-row>
         <!--        归还图书表格栏-->
         <el-row class="return-table">
           <el-col>
-            <el-table :data="borrows" height="100%" empty-text="没有数据">
+            <el-table
+              :data="borrows"
+              height="100%"
+              empty-text="没有数据"
+              @selection-change="updateSelection"
+            >
+              <el-table-column type="selection" width="50" />
               <el-table-column fixed prop="id" label="Id" width="50" />
               <el-table-column prop="bookName" label="书名" />
               <el-table-column prop="isbn" label="ISBN号码" />
@@ -96,7 +111,7 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { Search } from "@element-plus/icons-vue";
+import { Minus, Search } from "@element-plus/icons-vue";
 import axios from "axios";
 import { ElMessageBox } from "element-plus";
 
@@ -183,7 +198,11 @@ const searchBorrow = () => {
     getBorrow();
   }
 };
-
+const updateSelection = (selectedRows: string | any[]) => {
+  borrows.value.forEach((book: any) => {
+    book.selected = selectedRows.includes(book);
+  });
+};
 // 归还图书
 let returnName = ref("");
 let returnId = ref(0);
@@ -224,7 +243,24 @@ const returnBook = () => {
       });
   }
 };
-
+const returnSelectedBook = () => {
+  let selectedRows = borrows.value.filter((book: any) => {
+    return book.selected;
+  });
+  if (selectedRows.length == 0) {
+    ElMessageBox.alert("请先选择要归还的图书", "信息", {
+      confirmButtonText: "确认",
+    });
+  } else {
+    for (let i = 0; i < selectedRows.length; i++) {
+      axios.post("http://localhost:8888/borrow/return/" + selectedRows[i].id);
+    }
+  }
+  ElMessageBox.alert("归还成功", "信息", {
+    confirmButtonText: "确认",
+  });
+  getBorrow();
+};
 // 初始化
 const init = () => {
   getBorrow();

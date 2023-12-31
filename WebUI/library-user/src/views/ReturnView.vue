@@ -40,16 +40,16 @@
                   搜索
                 </el-button>
               </el-col>
-              <el-col :span="6">
-                <el-button
-                  type="primary"
-                  class="search-button"
-                  @click="returnSelectedBook"
-                >
-                  归还选中图书
-                </el-button>
-              </el-col>
             </el-row>
+          </el-col>
+          <el-col :span="4" class="search-page-pane">
+            <el-button
+              type="primary"
+              class="borrow-button"
+              @click="returnSelectedBook"
+            >
+              归还选中图书
+            </el-button>
           </el-col>
         </el-row>
         <!--        归还图书表格栏-->
@@ -73,8 +73,8 @@
               <el-table-column fixed="right" label="操作">
                 <template #default="borrows">
                   <el-button @click="returnBookDialog(borrows.row)" type="text"
-                    >归还</el-button
-                  >
+                    >归还
+                  </el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -101,7 +101,9 @@
               <el-button @click="returnBookDialogVisible = false"
                 >取消</el-button
               >
-              <el-button type="primary" @click="returnBook"> 确认 </el-button>
+              <el-button type="primary" @click="returnBook(true, undefined)"
+                >确认归还</el-button
+              >
             </span>
           </template>
         </el-dialog>
@@ -225,8 +227,12 @@ const returnBookDialog = (row: any) => {
   returnName.value = row.bookName;
   returnBookDialogVisible.value = true;
 };
-const returnBook = (messageEnabled: boolean) => {
+const returnBook = (messageEnabled: boolean, book: any) => {
   let statusCode = 0;
+  if (book != undefined) {
+    returnId.value = book.id;
+    returnName.value = book.bookName;
+  }
   if (returnId.value) {
     axios
       .post("http://localhost:8888/borrow/return/" + returnId.value)
@@ -257,6 +263,7 @@ const returnBook = (messageEnabled: boolean) => {
         }
       });
   }
+  getBorrow();
   return statusCode;
 };
 
@@ -265,22 +272,24 @@ const returnSelectedBook = () => {
     return book["selected"] == true;
   });
   console.log(selectedBooks);
-  let statusCode = 0;
   if (selectedBooks.length == 0) {
     ElMessageBox.alert("请选择要归还的图书", "信息", {
       confirmButtonText: "确认",
     });
   } else {
-    selectedBooks.forEach((book: any) => {
-      returnBookDialog(book);
-      statusCode = returnBook(false);
-    });
-    if (statusCode == 1) {
-      ElMessageBox.alert("归还图书成功", "信息", {
+    (async () => {
+      for (let i = 0; i < selectedBooks.length; i++) {
+        returnBook(false, selectedBooks[i]);
+      }
+      await ElMessageBox.alert("成功执行归还操作", "信息", {
         confirmButtonText: "确认",
+        callback: () => {
+          getBorrow();
+        },
       });
-    }
+    })();
   }
+  getBorrow();
 };
 // 初始化
 const init = () => {

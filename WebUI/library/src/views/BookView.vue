@@ -68,11 +68,27 @@
               添加图书
             </el-button>
           </el-col>
+          <el-col :span="4" class="search-page-pane">
+            <el-button
+              type="primary"
+              :icon="Minus"
+              class="delete-button"
+              @click="deleteSelectedBook"
+            >
+              删除选中图书
+            </el-button>
+          </el-col>
         </el-row>
         <!--        图书表格栏-->
         <el-row class="book-table">
           <el-col>
-            <el-table :data="books" height="100%" empty-text="没有数据">
+            <el-table
+              :data="books"
+              height="100%"
+              empty-text="没有数据"
+              @selection-change="updateSelection"
+            >
+              <el-table-column type="selection" width="50" />
               <el-table-column fixed prop="id" label="Id" width="50" />
               <el-table-column prop="groups" label="组名" />
               <el-table-column prop="name" label="书名" />
@@ -345,7 +361,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
-import { Plus, Search } from "@element-plus/icons-vue";
+import { Minus, Plus, Search } from "@element-plus/icons-vue";
 import axios from "axios";
 import { ElMessageBox } from "element-plus";
 import router from "@/router";
@@ -432,6 +448,11 @@ const searchInput = ref();
 const searchButton = () => {
   pageNum.value = 1;
   searchBook();
+};
+const updateSelection = (selectedRows: string | any[]) => {
+  books.value.forEach((book: any) => {
+    book.selected = selectedRows.includes(book);
+  });
 };
 // 搜索图书
 const searchBook = () => {
@@ -652,6 +673,41 @@ const deleteBook = () => {
           });
         }
       });
+  }
+};
+
+const deleteSelectedBook = () => {
+  let selectedBooks: any[] = [];
+  books.value.forEach((book: any) => {
+    if (book.selected) {
+      selectedBooks.push(book);
+    }
+  });
+  if (selectedBooks.length == 0) {
+    ElMessageBox.alert("请选择要删除的图书", "信息", {
+      confirmButtonText: "确认",
+    });
+  } else {
+    ElMessageBox.confirm("确认删除选中图书?", "信息", {
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      type: "warning",
+    }).then(() => {
+      (async () => {
+        for (let i = 0; i < selectedBooks.length; i++) {
+          await axios.post(
+            "http://localhost:8888/book/delete/" + selectedBooks[i].id
+          );
+        }
+        await ElMessageBox.alert("删除成功", "信息", {
+          confirmButtonText: "确认",
+          callback: () => {
+            deleteBookDialogVisible.value = false;
+          },
+        });
+        getBook();
+      })();
+    });
   }
 };
 

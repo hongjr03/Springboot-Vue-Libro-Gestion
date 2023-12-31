@@ -42,11 +42,26 @@
               </el-col>
             </el-row>
           </el-col>
+          <el-col :span="4" class="search-page-pane">
+            <el-button
+              type="primary"
+              class="borrow-button"
+              @click="returnSelectedBook"
+            >
+              归还选中图书
+            </el-button>
+          </el-col>
         </el-row>
         <!--        超时查询表格栏-->
         <el-row class="overtime-table">
           <el-col>
-            <el-table :data="overtimes" height="100%" empty-text="没有数据">
+            <el-table
+              :data="overtimes"
+              height="100%"
+              empty-text="没有数据"
+              @selection-change="updateSelection"
+            >
+              <el-table-column type="selection" width="50" />
               <el-table-column fixed prop="id" label="Id" width="50" />
               <el-table-column prop="bookName" label="书名" />
               <el-table-column prop="isbn" label="ISBN号码" />
@@ -196,6 +211,11 @@ const searchOvertime = () => {
     getOvertime();
   }
 };
+const updateSelection = (selectedRows: string | any[]) => {
+  overtimes.value.forEach((book: any) => {
+    book.selected = selectedRows.includes(book);
+  });
+};
 // 超时查询
 let overtimeName = ref("");
 let overtimeId = ref(0);
@@ -208,36 +228,65 @@ const overtimeBookDialog = (row: any) => {
   overtimeBookDialogVisible.value = true;
 };
 // 归还图书
-const overtimeBook = () => {
+const overtimeBook = (messageEnabled: boolean, book: any) => {
+  if (book != undefined) {
+    overtimeId.value = book.id;
+  }
   if (overtimeId.value) {
     axios
       .post("http://localhost:8888/borrow/return/" + overtimeId.value)
       .then((resp) => {
         const statusCode = resp.data.statusCode;
-
-        // 归还失败
-        if (statusCode == 0) {
-          ElMessageBox.alert("归还图书失败，请重试", "信息", {
-            confirmButtonText: "确认",
-          });
-        }
-        // 归还成功
-        if (statusCode == 1) {
-          ElMessageBox.alert("归还图书成功", "信息", {
-            confirmButtonText: "确认",
-            callback: () => {
-              overtimeBookDialogVisible.value = false;
-            },
-          });
-        }
-        // 借阅记录不存在
-        if (statusCode == 2) {
-          ElMessageBox.alert("归还失败，此借阅记录不存在", "信息", {
-            confirmButtonText: "确认",
-          });
+        if (messageEnabled) {
+          // 归还失败
+          if (statusCode == 0) {
+            ElMessageBox.alert("归还图书失败，请重试", "信息", {
+              confirmButtonText: "确认",
+            });
+          }
+          // 归还成功
+          if (statusCode == 1) {
+            ElMessageBox.alert("归还图书成功", "信息", {
+              confirmButtonText: "确认",
+              callback: () => {
+                overtimeBookDialogVisible.value = false;
+              },
+            });
+          }
+          // 借阅记录不存在
+          if (statusCode == 2) {
+            ElMessageBox.alert("归还失败，此借阅记录不存在", "信息", {
+              confirmButtonText: "确认",
+            });
+          }
         }
       });
   }
+};
+
+const returnSelectedBook = () => {
+  const selectedBooks = overtimes.value.filter((book: any) => {
+    return book["selected"] == true;
+  });
+  console.log(selectedBooks);
+  if (selectedBooks.length == 0) {
+    ElMessageBox.alert("请选择要归还的图书", "信息", {
+      confirmButtonText: "确认",
+    });
+  } else {
+    (async () => {
+      for (let i = 0; i < selectedBooks.length; i++) {
+        overtimeBook(false, selectedBooks[i]);
+      }
+      await ElMessageBox.alert("成功执行归还操作", "信息", {
+        confirmButtonText: "确认",
+        callback: () => {
+          getOvertime();
+        },
+      });
+    })();
+  }
+  getOvertime();
 };
 
 // 初始化

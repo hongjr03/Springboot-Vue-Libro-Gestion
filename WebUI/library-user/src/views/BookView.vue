@@ -288,28 +288,29 @@ const borrowSelectedBook = () => {
     return book["selected"] == true;
   });
   console.log(selectedBooks);
-  let statusCode = 0;
   if (selectedBooks.length == 0) {
     ElMessageBox.alert("请选择要借阅的图书", "信息", {
       confirmButtonText: "确认",
     });
   } else {
-    selectedBooks.forEach((book: any) => {
-      statusCode = borrowBook(book, false);
-      if (statusCode == 1) {
-        book["selected"] = false;
+    (async () => {
+      for (let i = 0; i < selectedBooks.length; i++) {
+        borrowBook(selectedBooks[i], false);
       }
-    });
+
+      await ElMessageBox.alert(
+        "成功执行借阅操作，请验证是否全部借阅成功",
+        "信息",
+        {
+          confirmButtonText: "确认",
+          callback: () => {
+            getBook();
+          },
+        }
+      );
+    })();
   }
-  if (statusCode == 1) {
-    ElMessageBox.alert("借阅成功", "信息", {
-      confirmButtonText: "确认",
-    });
-  } else {
-    ElMessageBox.alert("借阅失败，请手动重新借阅", "信息", {
-      confirmButtonText: "确认",
-    });
-  }
+  getBook(); // 重新获取图书信息
 };
 
 // 初始化

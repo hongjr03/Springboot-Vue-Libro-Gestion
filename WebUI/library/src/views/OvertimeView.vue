@@ -42,11 +42,26 @@
               </el-col>
             </el-row>
           </el-col>
+          <el-col>
+            <el-button
+              type="primary"
+              class="return-button"
+              @click="returnSelectedBook"
+            >
+              归还选中图书
+            </el-button>
+          </el-col>
         </el-row>
         <!--        超时查询表格栏-->
         <el-row class="overtime-table">
           <el-col>
-            <el-table :data="overtimes" height="100%" empty-text="没有数据">
+            <el-table
+              :data="overtimes"
+              height="100%"
+              empty-text="没有数据"
+              @selection-change="updateSelection"
+            >
+              <el-table-column type="selection" width="50" />
               <el-table-column fixed prop="id" label="Id" width="50" />
               <el-table-column prop="bookName" label="书名" />
               <el-table-column prop="isbn" label="ISBN号码" />
@@ -184,6 +199,11 @@ const searchOvertime = () => {
     getOvertime();
   }
 };
+const updateSelection = (selectedRows: string | any[]) => {
+  overtimes.value.forEach((book: any) => {
+    book.selected = selectedRows.includes(book);
+  });
+};
 // 超时查询
 let overtimeName = ref("");
 let overtimeId = ref(0);
@@ -226,6 +246,26 @@ const overtimeBook = () => {
         }
       });
   }
+};
+
+// 归还选中图书
+const returnSelectedBook = () => {
+  let selectedRows = overtimes.value.filter((book: any) => {
+    return book.selected;
+  });
+  if (selectedRows.length == 0) {
+    ElMessageBox.alert("请先选择要归还的图书", "信息", {
+      confirmButtonText: "确认",
+    });
+  } else {
+    selectedRows.forEach((row: any) => {
+      axios.post("http://localhost:8888/borrow/return/" + row.id);
+    });
+    ElMessageBox.alert("归还成功", "信息", {
+      confirmButtonText: "确认",
+    });
+  }
+  getOvertime();
 };
 
 // 初始化
