@@ -58,11 +58,25 @@
               </el-col>
             </el-row>
           </el-col>
+          <el-col :span="4" class="search-page-pane">
+            <el-button
+              type="primary"
+              class="borrow-button"
+              @click="borrowSelectedBook"
+            >
+              借阅选中图书
+            </el-button>
+          </el-col>
         </el-row>
         <!--        图书表格栏-->
         <el-row class="book-table">
           <el-col>
-            <el-table :data="books" height="100%" empty-text="没有数据">
+            <el-table
+              :data="books"
+              height="100%"
+              empty-text="没有数据"
+              @selection-change="updateSelection"
+            >
               <!-- 是否选中 -->
               <el-table-column type="selection" width="50" />
               <el-table-column fixed prop="id" label="Id" width="50" />
@@ -76,7 +90,7 @@
               <!-- 借阅按钮 -->
               <el-table-column fixed="right" label="操作">
                 <template #default="{ row }">
-                  <el-button @click="borrowBook(row)" type="text"
+                  <el-button @click="borrowBook(row, true)" type="text"
                     >借阅</el-button
                   >
                 </template>
@@ -112,6 +126,9 @@ const getBook = () => {
     .get("http://localhost:8888/book/" + pageNum.value + "/" + pageSize.value)
     .then((resp) => {
       books.value = resp.data.content;
+      books.value.forEach((book: any) => {
+        book["selected"] = false;
+      });
       pageTotal.value = resp.data.totalElements;
       // console.log(resp.data.content);
     });
@@ -218,49 +235,81 @@ const userInfo = reactive({
   phone: jsCookie.get("phone"),
 });
 
-const borrowBook = (row: any) => {
-  console.log(row["isbn"]);
+const updateSelection = (selectedRows: string | any[]) => {
+  books.value.forEach((book: any) => {
+    book.selected = selectedRows.includes(book);
+  });
+};
+
+const borrowBook = (row: any, messageEnabled: boolean) => {
+  let statusCode = 0;
   axios
     .post("http://localhost:8888/borrow/" + row["isbn"], userInfo)
     .then((resp) => {
-      console.log(userInfo);
-      const statusCode = resp.data.statusCode;
-
-      // 借阅失败
-      if (statusCode == 0) {
-        ElMessageBox.alert("借阅失败，请重新借阅", "信息", {
-          confirmButtonText: "确认",
-        });
-      }
-
-      // 借阅成功
-      if (statusCode == 1) {
-        ElMessageBox.alert("借阅成功", "信息", {
-          confirmButtonText: "确认",
-        });
-      }
-
-      // 借阅失败，库存不足
-      if (statusCode == 2) {
-        ElMessageBox.alert("借阅失败，库存不足", "信息", {
-          confirmButtonText: "确认",
-        });
-      }
-
-      // 借阅失败，卡号不存在
-      if (statusCode == 3) {
-        ElMessageBox.alert("借阅失败，卡号不存在", "信息", {
-          confirmButtonText: "确认",
-        });
-      }
-
-      // 借阅失败，用户可借阅数量已达上限
-      if (statusCode == 4) {
-        ElMessageBox.alert("借阅失败，用户可借阅数量已达上限", "信息", {
-          confirmButtonText: "确认",
-        });
+      statusCode = resp.data.statusCode;
+      if (messageEnabled) {
+        // 借阅成功
+        if (statusCode == 1) {
+          ElMessageBox.alert("借阅成功", "信息", {
+            confirmButtonText: "确认",
+          });
+        }
+        // 借阅失败
+        if (statusCode == 0) {
+          ElMessageBox.alert("借阅失败，请重新借阅", "信息", {
+            confirmButtonText: "确认",
+          });
+        }
+        // 借阅失败，库存不足
+        if (statusCode == 2) {
+          ElMessageBox.alert("借阅失败，库存不足", "信息", {
+            confirmButtonText: "确认",
+          });
+        }
+        // 借阅失败，卡号不存在
+        if (statusCode == 3) {
+          ElMessageBox.alert("借阅失败，卡号不存在", "信息", {
+            confirmButtonText: "确认",
+          });
+        }
+        // 借阅失败，用户可借阅数量已达上限
+        if (statusCode == 4) {
+          ElMessageBox.alert("借阅失败，用户可借阅数量已达上限", "信息", {
+            confirmButtonText: "确认",
+          });
+        }
       }
     });
+  return statusCode;
+};
+
+const borrowSelectedBook = () => {
+  const selectedBooks = books.value.filter((book: any) => {
+    return book["selected"] == true;
+  });
+  console.log(selectedBooks);
+  let statusCode = 0;
+  if (selectedBooks.length == 0) {
+    ElMessageBox.alert("请选择要借阅的图书", "信息", {
+      confirmButtonText: "确认",
+    });
+  } else {
+    selectedBooks.forEach((book: any) => {
+      statusCode = borrowBook(book, false);
+      if (statusCode == 1) {
+        book["selected"] = false;
+      }
+    });
+  }
+  if (statusCode == 1) {
+    ElMessageBox.alert("借阅成功", "信息", {
+      confirmButtonText: "确认",
+    });
+  } else {
+    ElMessageBox.alert("借阅失败，请手动重新借阅", "信息", {
+      confirmButtonText: "确认",
+    });
+  }
 };
 
 // 初始化

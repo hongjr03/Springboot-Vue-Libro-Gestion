@@ -40,13 +40,29 @@
                   搜索
                 </el-button>
               </el-col>
+              <el-col :span="6">
+                <el-button
+                  type="primary"
+                  class="search-button"
+                  @click="returnSelectedBook"
+                >
+                  归还选中图书
+                </el-button>
+              </el-col>
             </el-row>
           </el-col>
         </el-row>
         <!--        归还图书表格栏-->
         <el-row class="return-table">
           <el-col>
-            <el-table :data="borrows" height="100%" empty-text="没有数据">
+            <el-table
+              :data="borrows"
+              height="100%"
+              empty-text="没有数据"
+              @selection-change="updateSelection"
+            >
+              <!-- 是否选中 -->
+              <el-table-column type="selection" width="50" />
               <el-table-column fixed prop="id" label="Id" width="50" />
               <el-table-column prop="bookName" label="书名" />
               <el-table-column prop="isbn" label="ISBN号码" />
@@ -194,6 +210,11 @@ const searchBorrow = () => {
     getBorrow();
   }
 };
+const updateSelection = (selectedRows: string | any[]) => {
+  borrows.value.forEach((book: any) => {
+    book.selected = selectedRows.includes(book);
+  });
+};
 
 // 归还图书
 let returnName = ref("");
@@ -204,35 +225,61 @@ const returnBookDialog = (row: any) => {
   returnName.value = row.bookName;
   returnBookDialogVisible.value = true;
 };
-const returnBook = () => {
+const returnBook = (messageEnabled: boolean) => {
+  let statusCode = 0;
   if (returnId.value) {
     axios
       .post("http://localhost:8888/borrow/return/" + returnId.value)
       .then((resp) => {
-        const statusCode = resp.data.statusCode;
-
-        // 归还失败
-        if (statusCode == 0) {
-          ElMessageBox.alert("归还图书失败，请重试", "信息", {
-            confirmButtonText: "确认",
-          });
-        }
-        // 归还成功
-        if (statusCode == 1) {
-          ElMessageBox.alert("归还图书成功", "信息", {
-            confirmButtonText: "确认",
-            callback: () => {
-              returnBookDialogVisible.value = false;
-            },
-          });
-        }
-        // 借阅记录不存在
-        if (statusCode == 2) {
-          ElMessageBox.alert("归还失败，此借阅记录不存在", "信息", {
-            confirmButtonText: "确认",
-          });
+        statusCode = resp.data.statusCode;
+        if (messageEnabled) {
+          // 归还失败
+          if (statusCode == 0) {
+            ElMessageBox.alert("归还图书失败，请重试", "信息", {
+              confirmButtonText: "确认",
+            });
+          }
+          // 归还成功
+          if (statusCode == 1) {
+            ElMessageBox.alert("归还图书成功", "信息", {
+              confirmButtonText: "确认",
+              callback: () => {
+                returnBookDialogVisible.value = false;
+              },
+            });
+          }
+          // 借阅记录不存在
+          if (statusCode == 2) {
+            ElMessageBox.alert("归还失败，此借阅记录不存在", "信息", {
+              confirmButtonText: "确认",
+            });
+          }
         }
       });
+  }
+  return statusCode;
+};
+
+const returnSelectedBook = () => {
+  const selectedBooks = borrows.value.filter((book: any) => {
+    return book["selected"] == true;
+  });
+  console.log(selectedBooks);
+  let statusCode = 0;
+  if (selectedBooks.length == 0) {
+    ElMessageBox.alert("请选择要归还的图书", "信息", {
+      confirmButtonText: "确认",
+    });
+  } else {
+    selectedBooks.forEach((book: any) => {
+      returnBookDialog(book);
+      statusCode = returnBook(false);
+    });
+    if (statusCode == 1) {
+      ElMessageBox.alert("归还图书成功", "信息", {
+        confirmButtonText: "确认",
+      });
+    }
   }
 };
 // 初始化

@@ -97,17 +97,27 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import { Search } from "@element-plus/icons-vue";
 import axios from "axios";
 import { ElMessageBox } from "element-plus";
+import jsCookie from "js-cookie";
+
+let username = jsCookie.get("username");
+const userInfo = reactive({
+  name: jsCookie.get("username"),
+  idCard: jsCookie.get("idCard"),
+  phone: jsCookie.get("phone"),
+});
 
 // 超时未归还图书信息
 let overtimes = ref();
 const getOvertime = () => {
   axios
     .get(
-      "http://localhost:8888/borrow/overtime/" +
+      "http://localhost:8888/borrow/overtime/search/" +
+        userInfo.idCard +
+        "/" +
         pageNum.value +
         "/" +
         pageSize.value
@@ -174,7 +184,9 @@ const searchOvertime = () => {
           "/" +
           pageNum.value +
           "/" +
-          pageSize.value
+          pageSize.value +
+          "/user/" +
+          userInfo.idCard
       )
       .then((resp) => {
         overtimes.value = resp.data.content;
@@ -230,7 +242,13 @@ const overtimeBook = () => {
 
 // 初始化
 const init = () => {
-  getOvertime();
+  axios.get("http://localhost:8888/user/get/" + username).then((resp) => {
+    userInfo.name = resp.data.name;
+    userInfo.idCard = resp.data.idCard;
+    userInfo.phone = resp.data.phone;
+    console.log(resp.data);
+    getOvertime();
+  });
 };
 init();
 </script>

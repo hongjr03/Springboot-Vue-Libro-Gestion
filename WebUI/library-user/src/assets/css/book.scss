@@ -33,6 +33,13 @@
       border-bottom-left-radius: 0;
       height: 42px;
     }
+    .borrow-button {
+      width: 100%;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      height: 42px;
+      margin: v-bind("{'margin-left': searchPage ? '0' : '16px'}");
+    }
   }
 
   // 图书表格样式

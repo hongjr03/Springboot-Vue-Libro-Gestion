@@ -3,6 +3,7 @@ import LoginView from "@/views/LoginView.vue";
 import NavView from "@/views/NavView.vue";
 import BookView from "@/views/BookView.vue";
 import UserView from "@/views/UserView.vue";
+import RegisterView from "@/views/RegisterView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -37,12 +38,6 @@ const routes: Array<RouteRecordRaw> = [
         meta: { show: true },
       },
       {
-        path: "/borrow",
-        name: "借阅信息",
-        component: () => import("@/views/BorrowView.vue"),
-        meta: { show: true },
-      },
-      {
         path: "/return",
         name: "归还信息",
         component: () => import("@/views/ReturnView.vue"),
@@ -55,6 +50,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { show: true },
       },
     ],
+  },
+  {
+    path: "/register",
+    name: "用户注册",
+    component: RegisterView,
+    meta: { show: false },
   },
 ];
 

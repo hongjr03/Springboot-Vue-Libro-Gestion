@@ -8,6 +8,7 @@
           <!--  登陆表单左面板 -->
           <el-col :span="12" class="login-form-left">
             <p>图书管理系统</p>
+            <p>登录页面</p>
           </el-col>
           <!--  登陆表单右面板 -->
           <el-col :span="12" class="login-form-right">
@@ -19,7 +20,7 @@
               @keyup.enter="login(loginFormRef)"
             >
               <el-form-item>
-                <p>图书管理系统-登录</p>
+                <p>用户登录</p>
               </el-form-item>
               <el-form-item prop="username">
                 <el-input
@@ -41,6 +42,9 @@
                   ref="loginButtonRef"
                   >登录</el-button
                 >
+              </el-form-item>
+              <el-form-item>
+                <el-button type="info" @click="register">注册</el-button>
               </el-form-item>
             </el-form>
           </el-col>
@@ -72,6 +76,10 @@ const loginForm = reactive({
   username: "",
   password: "",
 });
+
+const register = () => {
+  router.push("/register");
+};
 
 // 表单校验
 const loginRules = reactive<FormRules>({

@@ -15,6 +15,9 @@
             >
               <el-icon v-if="item.name === '图书信息'"><Reading /></el-icon>
               <el-icon v-if="item.name === '用户信息'"><User /></el-icon>
+              <el-icon v-if="item.name === '借阅信息'"><ReadingLamp /></el-icon>
+              <el-icon v-if="item.name === '归还信息'"><Notebook /></el-icon>
+              <el-icon v-if="item.name === '超期信息'"><Clock /></el-icon>
               <p>{{ item.name }}</p></el-menu-item
             >
             <el-menu-item @click="loginOut"
@@ -62,7 +65,15 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { Reading, User, Setting, Back } from "@element-plus/icons-vue";
+import {
+  Reading,
+  User,
+  Setting,
+  Back,
+  ReadingLamp,
+  Clock,
+  Notebook,
+} from "@element-plus/icons-vue";
 import { ElMessageBox } from "element-plus";
 import router from "../router/index";
 import jsCookie from "js-cookie";
