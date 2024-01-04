@@ -4,6 +4,7 @@
   padding: 0;
   width: 100%;
   height: 100%;
+  background-image: url("~@/assets/images/background1.jpg");
 
   // 主要区域样式
   .el-main {
@@ -31,7 +32,8 @@
         // 图标样式
         i {
           margin-left: 24px;
-          font-size: 64px;
+          font-size: 70px;
+          font-weight:bold;
         }
         // 面板信息样式
         .message {
@@ -55,16 +57,25 @@
 
       // 仪表盘颜色
       .book-num div {
-        background-color: #3C8CE7;
+        background-color: #0088a8;
+        border-top-right-radius: 80px; /* 右上角边角弧度 */
+        border-bottom-right-radius: 80px;
       }
       .overtime-num div {
-        background-color: #E54D52;
+        background-color: #ff8888;
+        border-top-right-radius: 80px;
+        border-bottom-right-radius: 80px;
+
       }
       .borrow-num div {
-        background-color: #5AB556;
+        background-color: #00ddaa;
+        border-top-right-radius: 80px;
+        border-bottom-right-radius: 80px;
       }
       .system-time div {
-        background-color: #FAA64B;
+        background-color: #ffddaa;
+        border-top-right-radius: 80px;
+        border-bottom-right-radius: 80px;
       }
     }
 
