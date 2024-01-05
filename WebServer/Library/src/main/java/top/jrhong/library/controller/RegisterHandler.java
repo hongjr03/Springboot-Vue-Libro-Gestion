@@ -1,5 +1,6 @@
 package top.jrhong.library.controller;
 
+import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -126,9 +127,13 @@ public class RegisterHandler {
             // 设置用户状态
             user.setState(1);
             // 设置用户借书数量
-            user.setBookCount(0);
+            user.setBookCount(10);
             // 保存用户
-            user.setIdCard("");
+//            String idCard = userRepository.findAll().
+//            Integer idCard_int = Integer.parseInt(idCard)+1;
+//            idCard = Integer.toString(idCard_int);
+//            user.setIdCard(idCard);
+            user.setIdCard("18002020");
             String identity = "";
             if (userGroups.equals("user")) {
                 identity = "用户";
@@ -136,8 +141,14 @@ public class RegisterHandler {
                 identity = "管理员";
             }
             user.setIdentity(identity);
+
             user.setName(user.getUsername());
             user.setPhone("");
+
+            // 加密密码
+            String encryptedPassword = SecureUtil.md5(user.getPassword());
+            user.setPassword(encryptedPassword);
+
             userRepository.save(user);
             registerInfo.put("statusCode", 2);
             registerInfo.put("message", "注册成功");

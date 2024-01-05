@@ -13,9 +13,17 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>Library</name>
     <description>Library</description>
+
     <properties>
         <java.version>1.8</java.version>
+
+        <jasypt.version>1.9.2</jasypt.version>
+        <jasypt.spring.version>1.9.2</jasypt.spring.version>
+        <icu4j.version>3.4.4</icu4j.version>
+        <jasypt.lite.version>1.9.2</jasypt.lite.version>
+
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -34,7 +42,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.30</version>
+            <!--            <optional>true</optional>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -66,6 +75,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.3.10</version>
         </dependency>
 
     </dependencies>

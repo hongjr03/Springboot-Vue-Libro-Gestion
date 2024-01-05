@@ -1,5 +1,6 @@
 package top.jrhong.library.controller;
 
+import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import top.jrhong.library.entitys.User;
 import top.jrhong.library.repository.UserRepository;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 /**
  * 登录控制器
+ *
  * @author KSaMar
  */
 @RestController
@@ -27,6 +29,7 @@ public class LoginHandler {
 
     /**
      * 管理员登录
+     *
      * @param user 用户信息
      * @return 登录信息
      */
@@ -37,6 +40,7 @@ public class LoginHandler {
 
     /**
      * 用户登录
+     *
      * @param user 用户信息
      * @return 登录信息
      */
@@ -50,14 +54,18 @@ public class LoginHandler {
      * 0 - 账号或密码错误
      * 1 - 登录成功
      * 2 - 账号冻结无法登录
+     *
      * @param user 用户表单
      * @return 登录状态
      */
+
+
     public JSONObject login(User user, String userGroups) {
+        String input_password = user.getPassword();
         // 封装表单
         Example<User> userExample = Example.of(user);
         // 搜索用户
-        Optional<User> userOptional = userRepository.findOne(userExample);
+        Optional<User> userOptional = Optional.ofNullable(userRepository.findByUsername(user.getUsername()));
         // 创建登录返回信息
         JSONObject loginMessage = new JSONObject();
         loginMessage.put("message", "login");
@@ -70,14 +78,17 @@ public class LoginHandler {
             // 判断用户是否为 用户组
             if (userGroups.equals(userTemp.getGroups())) {
                 if (userTemp.getState() == 1) {
+
+                    // 修改
                     // 判断用户账号密码是否正确
-                    if (!user.getUsername().equals(userTemp.getUsername()) || !user.getPassword().equals(userTemp.getPassword())) {
+                    String inputPassword = SecureUtil.md5(user.getPassword());
+                    String savedPassword = userTemp.getPassword();
+                    if (!user.getUsername().equals(userTemp.getUsername()) || !inputPassword.equals(savedPassword)) {
                         return loginMessage;
                     }
                     loginMessage.replace("statusCode", 1);
                     loginMessage.put("username", user.getUsername());
-                }
-                else {
+                } else {
                     loginMessage.replace("statusCode", 2);
                 }
             }
