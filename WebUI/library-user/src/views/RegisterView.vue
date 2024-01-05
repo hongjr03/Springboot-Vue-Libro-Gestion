@@ -73,7 +73,7 @@
                 >
               </el-form-item>
               <el-form-item>
-                <el-button type="info" @click="login">返回登录</el-button>
+                <el-button type="info" @click="usrlogin">返回登录</el-button>
               </el-form-item>
             </el-form>
           </el-col>
@@ -98,6 +98,7 @@ let registerState = ref(false);
 
 // 注册表单
 const registerFormRef = ref<FormInstance>();
+
 const registerForm = reactive({
   username: "",
   email: "",
@@ -106,7 +107,7 @@ const registerForm = reactive({
   code: "",
 });
 
-const login = () => {
+const usrlogin = () => {
   router.push("/login");
 };
 
@@ -192,13 +193,8 @@ const register = (formEl: FormInstance | undefined) => {
             ElMessageBox.alert("注册成功", "信息", {
               confirmButtonText: "确认",
               callback: () => {
-                // 设置Cookie
-                jsCookie.set("username", resp.data.username, {
-                  expires: 1,
-                  path: "/",
-                });
                 // 页面跳转
-                router.push("/home");
+                router.push("/login");
               },
             });
           }
