@@ -80,6 +80,7 @@
               <!--              <el-table-column prop="gender" label="性别" />-->
               <el-table-column prop="idCard" label="借书卡号" />
               <el-table-column prop="phone" label="手机号" />
+              <el-table-column prop="email" label="邮箱" />
               <el-table-column prop="identity" label="身份" />
               <el-table-column prop="bookCount" label="可借书数量" />
               <el-table-column prop="state" label="用户状态">
@@ -121,6 +122,7 @@
         <el-dialog
           v-model="addUserFormVisible"
           title="添加用户"
+          @open="getNextIdCard"
           class="add-user-dialog"
           width="500px"
           :close-on-click-modal="false"
@@ -203,6 +205,8 @@
               <el-input
                 v-model.number="addUserForm.idCard"
                 autocomplete="off"
+                disabled
+                readonly
               ></el-input>
             </el-form-item>
             <el-form-item
@@ -214,6 +218,16 @@
                 v-model.number="addUserForm.phone"
                 autocomplete="off"
                 maxlength="11"
+              ></el-input>
+            </el-form-item>
+            <el-form-item
+              label="邮箱"
+              :label-width="formLabelWidth"
+              prop="email"
+            >
+              <el-input
+                v-model="addUserForm.email"
+                autocomplete="off"
               ></el-input>
             </el-form-item>
             <el-form-item
@@ -333,6 +347,7 @@
                 v-model.number="editUserForm.idCard"
                 autocomplete="off"
                 disabled
+                readonly
               ></el-input>
             </el-form-item>
             <el-form-item
@@ -449,6 +464,12 @@ const getUser = () => {
     });
 };
 
+const getNextIdCard = () => {
+  axios.get("http://localhost:8888/user/nextIdCard").then((resp) => {
+    addUserForm.idCard = resp.data;
+  });
+};
+
 // 显示数据数量选项
 let pageNum = ref(1);
 let pageSize = ref(10);
@@ -546,6 +567,7 @@ const userRules = reactive<FormRules>({
   gender: [{ required: true, message: "请选择性别", trigger: "change" }],
   idCard: [{ required: true, message: "请输入借书卡号", trigger: "blur" }],
   phone: [{ required: true, message: "请输入手机号", trigger: "blur" }],
+  email: [{ required: true, message: "请输入邮箱", trigger: "blur" }],
   identity: [{ required: true, message: "请选择身份", trigger: "change" }],
   bookCount: [
     { required: true, message: "请输入可借阅图书数量", trigger: "blur" },
@@ -622,6 +644,7 @@ let addUserForm = reactive({
   gender: "",
   idCard: "",
   phone: "",
+  email: "",
   identity: "",
 });
 

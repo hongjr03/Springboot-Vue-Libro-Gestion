@@ -127,13 +127,16 @@ public class RegisterHandler {
             // 设置用户状态
             user.setState(1);
             // 设置用户借书数量
-            user.setBookCount(10);
+            if (userGroups.equals("user")) {
+                user.setBookCount(3);
+            } else {
+                user.setBookCount(1000);
+            }
             // 保存用户
-//            String idCard = userRepository.findAll().
-//            Integer idCard_int = Integer.parseInt(idCard)+1;
-//            idCard = Integer.toString(idCard_int);
-//            user.setIdCard(idCard);
-            user.setIdCard("18002020");
+            String IdCard = userRepository.findLatestIdCard().get(0);
+            Integer idCard = Integer.parseInt(IdCard)+1;
+            user.setIdCard(idCard.toString());
+//            user.setIdCard("18002020");
             String identity = "";
             if (userGroups.equals("user")) {
                 identity = "用户";

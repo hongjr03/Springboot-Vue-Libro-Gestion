@@ -126,6 +126,22 @@ public class UserHandler {
     }
 
     /**
+     * 返回下一个用户借书卡号
+     * @return 用户借书卡号
+     */
+    @GetMapping("/nextIdCard")
+    public String getNextIdCard() {
+//        String IdCard = userRepository.findLatestIdCard();
+//        Integer idCard = Integer.parseInt(IdCard)+1;
+//        return idCard.toString();
+        String IdCard = userRepository.findLatestIdCard().get(0);
+        Integer idCard = Integer.parseInt(IdCard)+1;
+        String idCardStr = idCard.toString();
+        System.out.println(idCardStr);
+        return idCardStr;
+    }
+
+    /**
      * 编辑用户
      * 0 - 编辑用户失败
      * 1 - 编辑用户成功

@@ -61,11 +61,11 @@ public class LoginHandler {
 
 
     public JSONObject login(User user, String userGroups) {
-        String input_password = user.getPassword();
+        user.setPassword(SecureUtil.md5(user.getPassword()));
         // 封装表单
         Example<User> userExample = Example.of(user);
         // 搜索用户
-        Optional<User> userOptional = Optional.ofNullable(userRepository.findByUsername(user.getUsername()));
+        Optional<User> userOptional = userRepository.findOne(userExample);
         // 创建登录返回信息
         JSONObject loginMessage = new JSONObject();
         loginMessage.put("message", "login");
@@ -81,7 +81,7 @@ public class LoginHandler {
 
                     // 修改
                     // 判断用户账号密码是否正确
-                    String inputPassword = SecureUtil.md5(user.getPassword());
+                    String inputPassword = user.getPassword();
                     String savedPassword = userTemp.getPassword();
                     if (!user.getUsername().equals(userTemp.getUsername()) || !inputPassword.equals(savedPassword)) {
                         return loginMessage;
