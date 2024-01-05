@@ -192,13 +192,8 @@ const register = (formEl: FormInstance | undefined) => {
             ElMessageBox.alert("注册成功", "信息", {
               confirmButtonText: "确认",
               callback: () => {
-                // 设置Cookie
-                jsCookie.set("username", resp.data.username, {
-                  expires: 1,
-                  path: "/",
-                });
                 // 页面跳转
-                router.push("/home");
+                router.push("/login");
               },
             });
           }

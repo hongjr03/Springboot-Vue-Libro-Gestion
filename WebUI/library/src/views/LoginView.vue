@@ -8,7 +8,7 @@
           <!--  登陆表单左面板 -->
           <el-col :span="12" class="login-form-left">
             <p>图书管理系统</p>
-            <p>管理员页面</p>
+            <p1>管理员页面</p1>
           </el-col>
           <!--  登陆表单右面板 -->
           <el-col :span="12" class="login-form-right">
