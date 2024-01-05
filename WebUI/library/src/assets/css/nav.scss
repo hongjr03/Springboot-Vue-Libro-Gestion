@@ -10,7 +10,7 @@ $blue:#3C8CE7;
   // 导航栏样式
   .el-aside {
     width: 240px;
-    background: $blue !important;
+    background:#009fcc !important;
 
     // 导航栏标题
     .title {
@@ -22,7 +22,7 @@ $blue:#3C8CE7;
 
     // 菜单
     .el-menu {
-      background-color: $blue;
+      background-color: #009fcc;
       border-right: 0;
 
       // 菜单文字颜色
@@ -36,7 +36,7 @@ $blue:#3C8CE7;
       .el-sub-menu div:hover,
       .el-sub-menu li:hover,
       .el-menu-item:hover {
-        background-color: #4896ef;
+        background-color: #00bbff;
       }
 
       // 菜单图标
