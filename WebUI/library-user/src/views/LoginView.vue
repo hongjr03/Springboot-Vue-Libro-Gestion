@@ -64,7 +64,7 @@
       border-bottom-left-radius: 60px;
       -ms-backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-     background-color: rgba(255, 255, 255, 0.7);
+     background-color: rgba(255, 255, 255, 0.8);
     }
 
     // 登录窗体右样式
