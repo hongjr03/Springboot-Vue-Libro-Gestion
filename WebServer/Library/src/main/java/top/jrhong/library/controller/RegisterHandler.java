@@ -2,6 +2,7 @@ package top.jrhong.library.controller;
 
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.jasypt.encryption.StringEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +22,12 @@ import java.util.Random;
 @RestController
 @RequestMapping("/register")
 public class RegisterHandler {
+    // 修改
+    @Autowired
+    public StringEncryptor customEncryptor;
 
     private String code;
+
 
     /**
      * 用户数据库操作接口
@@ -101,6 +106,7 @@ public class RegisterHandler {
         // 封装表单
         // 搜索用户
         // 封装表单
+
         Example<User> userExample = Example.of(user);
         // 搜索用户
         Optional<User> userOptional = userRepository.findOne(userExample);
@@ -145,9 +151,12 @@ public class RegisterHandler {
             user.setName(user.getUsername());
             user.setPhone("");
 
+            // 修改
             // 加密密码
-            String encryptedPassword = SecureUtil.md5(user.getPassword());
+            String encryptedPassword = customEncryptor.encrypt(user.getPassword());
             user.setPassword(encryptedPassword);
+//            String encryptedPassword = SecureUtil.md5(user.getPassword());
+//            user.setPassword(encryptedPassword);
 
             userRepository.save(user);
             registerInfo.put("statusCode", 2);
