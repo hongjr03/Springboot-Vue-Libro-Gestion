@@ -2,6 +2,7 @@ package top.jrhong.library.controller;
 
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.jasypt.encryption.StringEncryptor;
 import top.jrhong.library.entitys.User;
 import top.jrhong.library.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/login")
 public class LoginHandler {
+    @Autowired
+    public StringEncryptor customEncryptor;
     /**
      * 用户数据库操作接口
      */
@@ -61,7 +64,6 @@ public class LoginHandler {
 
 
     public JSONObject login(User user, String userGroups) {
-        user.setPassword(SecureUtil.md5(user.getPassword()));
         // 封装表单
         Example<User> userExample = Example.of(user);
         // 搜索用户
@@ -81,9 +83,7 @@ public class LoginHandler {
 
                     // 修改
                     // 判断用户账号密码是否正确
-                    String inputPassword = user.getPassword();
-                    String savedPassword = userTemp.getPassword();
-                    if (!user.getUsername().equals(userTemp.getUsername()) || !inputPassword.equals(savedPassword)) {
+                    if (!user.getUsername().equals(userTemp.getUsername()) || !user.getPassword().equals(customEncryptor.decrypt(userTemp.getPassword()))) {
                         return loginMessage;
                     }
                     loginMessage.replace("statusCode", 1);
