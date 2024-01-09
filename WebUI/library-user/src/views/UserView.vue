@@ -83,7 +83,7 @@ import jsCookie from "js-cookie";
 
 // 用户头像
 let imageUrl;
-imageUrl = require("../assets/images/user.png");
+imageUrl = require("../assets/images/user2.jpg");
 
 // 用户名
 let username = jsCookie.get("username");

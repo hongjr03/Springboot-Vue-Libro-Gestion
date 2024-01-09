@@ -4,6 +4,8 @@
   padding: 0;
   width: 100%;
   height: 100%;
+  //background-image: url("~@/assets/images/background1.jpg");
+
 
   // 用户信息卡片
   .user-card {
@@ -18,21 +20,25 @@
       justify-content: center;
       width: 100%;
       height: 100%;
-      background-color: #3C8CE7;
+      background-color: #009fcc;
+      background-image: url("~@/assets/images/background1.jpg");
+
       color: white;
 
       .user-img {
-        width: 128px;
-        height: 128px;
+        width: 150px;
+        height: 150px;
+        border-radius:75px;
       }
     }
 
     // 用户图书信息面板
     .user-book {
-      border: 2px solid #3C8CE7;
+      border: 2px solid #ffddaa;
       height: 100%;
 
       .title {
+        //background-color:#009fcc;
         text-align: center;
         font-size: 24px;
         height: 32px;

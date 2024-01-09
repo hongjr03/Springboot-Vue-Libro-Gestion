@@ -1,10 +1,12 @@
 package top.jrhong.library.repository;
 
-import top.jrhong.library.entitys.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import top.jrhong.library.entitys.User;
+
+import java.util.List;
 
 /**
  * 用户数据库操作接口
@@ -59,4 +61,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      * @return 用户信息
      */
     User findByPhone(String phone);
+
+    /**
+     * 获取最末尾的用户IDCard字符串
+     * @return 用户IDCard
+     */
+    // 按照idCard降序排序，取第一个
+    @Query(value = "select user.idCard from User user order by user.idCard desc")
+    List<String> findLatestIdCard();
 }
